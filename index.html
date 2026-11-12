@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For My Favorite Person — A Pink Apology Quest</title>
+
+  <!-- Google Fonts: Cormorant Garamond (Romantic Serif), Fredoka (Playful Gamified), Caveat (Handwritten Polaroids), Plus Jakarta Sans (Clean UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,700&family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- Ambient Floating Petals / Hearts Canvas -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <!-- Confetti & Sparkle Burst Canvas -->
+  <canvas id="fxCanvas" aria-hidden="true"></canvas>
+
+  <!-- Custom Cursor Glow (Desktop) -->
+  <div id="cursorGlow" aria-hidden="true"></div>
+
+  <!-- Top Gamified HUD -->
+  <header class="hud" id="hud">
+    <div class="hud-left">
+      <div class="hud-badge">
+        <span class="pulse-heart">♥</span>
+        <span id="stageLabel">Prologue</span>
+      </div>
+      <div class="hud-memories" title="Memories Unlocked">
+        <span class="hud-icon">📸</span>
+        <span>Memories: <strong id="memoriesCount">0</strong>/5</span>
+      </div>
+    </div>
+
+    <div class="hud-center">
+      <div class="meter-wrap">
+        <div class="meter-top">
+          <span class="meter-title">Forgiveness &amp; Love Meter</span>
+          <span class="meter-pct" id="lovePct">0%</span>
+        </div>
+        <div class="meter-track">
+          <div class="meter-fill" id="loveFill" style="width: 0%">
+            <span class="meter-shimmer"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-right">
+      <button class="icon-btn" id="galleryShortcutBtn" title="View Unlocked Memories" aria-label="View Unlocked Memories">
+        <span>🖼️</span>
+        <span class="btn-mini-label">Album</span>
+      </button>
+      <button class="icon-btn" id="musicBtn" title="Toggle Romantic Music Box" aria-label="Toggle Romantic Music Box">
+        <span id="musicIcon">🎵</span>
+        <span class="btn-mini-label" id="musicLabel">Music: Off</span>
+      </button>
+      <button class="icon-btn active" id="sfxBtn" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
+        <span id="sfxIcon">🔊</span>
+        <span class="btn-mini-label" id="sfxLabel">SFX: On</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Stage Container -->
+  <main class="stage-shell">
+
+    <!-- STAGE 0: PROLOGUE / ENVELOPE -->
+    <section class="stage active" id="stage-0" data-stage="0">
+      <div class="glass-card hero-card">
+        <div class="pill-tag">✨ Special Delivery • Level 0 of 4</div>
+        <h1 class="hero-title">
+          I'm <span class="italic-accent">So Sorry</span> for Scolding You
+        </h1>
+        <p class="hero-subtitle">
+          You deserve soft words, endless patience, and the biggest hugs — never my grumpy tone.
+          I built this little pink quest just to say <strong>I love you endlessly</strong> and earn back that smile.
+        </p>
+
+        <div class="envelope-stage">
+          <div class="cameo-frame">
+            <img src="./assets/photo5_her_smile.jpg" alt="Her warm smile" />
+            <div class="cameo-glow"></div>
+          </div>
+          <div class="envelope-card" id="startEnvelope">
+            <div class="wax-seal">♥</div>
+            <div class="envelope-text">
+              <span class="handwriting-note">To the prettiest soul in my life...</span>
+              <span class="sub-note">Tap below to start the Apology Quest</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-row">
+          <button class="btn-primary btn-glow" id="startQuestBtn">
+            <span>Open My Apology Quest</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 1: CLEAR THE GRUMPY CLOUDS -->
+    <section class="stage" id="stage-1" data-stage="1">
+      <div class="glass-card game-card">
+        <div class="stage-header">
+          <div class="pill-tag">☁️ Quest 1 • Clear the Grumpy Clouds</div>
+          <h2 class="stage-title">Pop Every Silly Mistake I Made</h2>
+          <p class="stage-desc">
+            Tap all <strong>6 moody clouds</strong> to turn my mistakes into heartfelt apologies and unlock our first memory!
+          </p>
+        </div>
+
+        <div class="cloud-arena" id="cloudArena">
+          <!-- Clouds injected dynamically by JS -->
+        </div>
+
+        <div class="stage-status-bar">
+          <span id="cloudsLeftText">Clouds left to pop: <strong>6</strong></span>
+        </div>
+
+        <!-- Memory #1 Reveal Drawer -->
+        <div class="memory-reveal hidden" id="memory1Reveal">
+          <div class="polaroid tilt-left" data-photo="0">
+            <div class="polaroid-tape"></div>
+            <img src="./assets/photo1_playful_cap.jpg" alt="Playfully teasing with her white cap in front of the college bus" />
+            <p class="polaroid-caption">"I only ever want to mess with your cap to make you laugh — never scold you."</p>
+          </div>
+          <div class="reveal-message">
+            <span class="unlock-badge">🎉 Memory #1 Unlocked!</span>
+            <h3>My heart hurts whenever I'm the reason you're upset.</h3>
+            <p>You're my favorite person to tease, laugh with, and protect. Never my target for frustration.</p>
+            <button class="btn-primary" id="toStage2Btn">Continue to Quest 2 →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 2: CATCH MY HEARTBEATS -->
+    <section class="stage" id="stage-2" data-stage="2">
+      <div class="glass-card game-card">
+        <div class="stage-header">
+          <div class="pill-tag">💖 Quest 2 • Catch My Heartbeats</div>
+          <h2 class="stage-title">Collect 8 Floating Love Hearts</h2>
+          <p class="stage-desc">
+            Tap the glowing pink &amp; gold hearts as they float up! Watch out — each heart plays a sweet note and fills my love meter for you.
+          </p>
+        </div>
+
+        <div class="heart-game-hud">
+          <div class="mini-counter">Hearts Caught: <strong id="heartsCaught">0</strong> / 8</div>
+          <div class="mini-progress-track">
+            <div class="mini-progress-fill" id="heartsProgressFill" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="heart-arena" id="heartArena">
+          <div class="arena-hint" id="heartArenaHint">Tap the floating hearts! 💕</div>
+        </div>
+
+        <!-- Memory #2 & #3 Reveal -->
+        <div class="memory-reveal dual hidden" id="memory23Reveal">
+          <div class="polaroid-pair">
+            <div class="polaroid tilt-left" data-photo="1">
+              <div class="polaroid-tape"></div>
+              <img src="./assets/photo2_car_puppies.jpg" alt="Cute car selfie with puppy ears filter" />
+              <p class="polaroid-caption">"Us being silly puppies together is my whole happy place 🐶💕"</p>
+            </div>
+            <div class="polaroid tilt-right" data-photo="2">
+              <div class="polaroid-tape"></div>
+              <img src="./assets/photo3_bus_hug.jpg" alt="Smiling arm in arm in front of the yellow college bus" />
+              <p class="polaroid-caption">"Standing right next to you like this is where I always belong."</p>
+            </div>
+          </div>
+          <div class="reveal-message center">
+            <span class="unlock-badge">🎉 Memories #2 &amp; #3 Unlocked!</span>
+            <h3>Every moment with you is pure magic to me.</h3>
+            <p>Even our random bus-stop photos and goofy car selfies mean the entire world to me.</p>
+            <button class="btn-primary" id="toStage3Btn">Continue to Quest 3 →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 3: PEEL & REVEAL SINCERE PROMISES -->
+    <section class="stage" id="stage-3" data-stage="3">
+      <div class="glass-card game-card">
+        <div class="stage-header">
+          <div class="pill-tag">🎀 Quest 3 • Sealed Pink Promises</div>
+          <h2 class="stage-title">Unseal My 3 Vows to You</h2>
+          <p class="stage-desc">
+            Tap each wax-sealed pink foil card to peel it open and reveal what I solemnly promise going forward.
+          </p>
+        </div>
+
+        <div class="promises-grid" id="promisesGrid">
+          <button class="promise-card" data-index="0">
+            <div class="promise-cover">
+              <div class="cover-seal">💌</div>
+              <span class="cover-title">Promise #1</span>
+              <span class="cover-hint">Tap to unseal</span>
+            </div>
+            <div class="promise-inside">
+              <span class="inside-num">01</span>
+              <h4>Gentle Voice Always</h4>
+              <p>No more scolding or sharp tone. Whenever I feel stressed, I'll pause, breathe, and speak to you with softness.</p>
+            </div>
+          </button>
+
+          <button class="promise-card" data-index="1">
+            <div class="promise-cover">
+              <div class="cover-seal">🧸</div>
+              <span class="cover-title">Promise #2</span>
+              <span class="cover-hint">Tap to unseal</span>
+            </div>
+            <div class="promise-inside">
+              <span class="inside-num">02</span>
+              <h4>Listen First, Hug First</h4>
+              <p>Your feelings always matter more than any tiny disagreement. I'm on your team — always.</p>
+            </div>
+          </button>
+
+          <button class="promise-card" data-index="2">
+            <div class="promise-cover">
+              <div class="cover-seal">👑</div>
+              <span class="cover-title">Promise #3</span>
+              <span class="cover-hint">Tap to unseal</span>
+            </div>
+            <div class="promise-inside">
+              <span class="inside-num">03</span>
+              <h4>Protect Your Smile</h4>
+              <p>My only job is to be your safe space, hype you up, and see that gorgeous smile every single day.</p>
+            </div>
+          </button>
+        </div>
+
+        <!-- Memory #4 Reveal -->
+        <div class="memory-reveal hidden" id="memory4Reveal">
+          <div class="polaroid tilt-right" data-photo="3">
+            <div class="polaroid-tape"></div>
+            <img src="./assets/photo4_sweet_gaze.jpg" alt="Looking fondly into each other's eyes" />
+            <p class="polaroid-caption">"The only way I ever want to look at you — full of admiration and love."</p>
+          </div>
+          <div class="reveal-message">
+            <span class="unlock-badge">🎉 Memory #4 Unlocked!</span>
+            <h3>Look at how you look at me here...</h3>
+            <p>I never want to take that trust or warmth for granted for even a second. Ready for the final boss?</p>
+            <button class="btn-primary" id="toStage4Btn">Go to Final Question →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 4: FINAL BOSS — FORGIVE THIS IDIOT? -->
+    <section class="stage" id="stage-4" data-stage="4">
+      <div class="glass-card boss-card">
+        <div class="pill-tag">👑 Final Boss • Heart-to-Heart</div>
+        <div class="boss-layout">
+          <div class="boss-photo-wrap">
+            <div class="polaroid tilt-left" data-photo="4">
+              <div class="polaroid-tape"></div>
+              <img src="./assets/photo5_her_smile.jpg" alt="Her radiant smile" />
+              <p class="polaroid-caption">"My favorite smile in the whole universe ✨"</p>
+            </div>
+          </div>
+
+          <div class="love-letter">
+            <h2 class="letter-heading">My Dearest Girl,</h2>
+            <p>
+              I'm genuinely, deeply sorry for scolding you. Even for a moment, you never deserved harshness from the person who loves you most in this world.
+            </p>
+            <p>
+              You bring so much warmth, laughter, and sweetness into my life — from our silly car rides and college bus memories to every quiet moment just holding your hand.
+            </p>
+            <p class="letter-signoff">
+              Please forgive your silly boy? I love you more than words can fit on a screen. ♥
+            </p>
+          </div>
+        </div>
+
+        <div class="boss-question">
+          <h3>So... will you forgive me and let me spoil you?</h3>
+          <p class="dodge-taunt" id="dodgeTaunt">Choose wisely, cutie 🥺👉👈</p>
+
+          <div class="boss-arena" id="bossArena">
+            <button class="btn-forgive" id="forgiveYesBtn">
+              <span>Yes, I Forgive You! 💖</span>
+            </button>
+            <button class="btn-mad" id="forgiveNoBtn">
+              <span>Still Mad 😤</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 5: GRAND FINALE — SCRAPBOOK + COUPONS + KISSES -->
+    <section class="stage" id="stage-5" data-stage="5">
+      <div class="glass-card finale-card">
+        <div class="finale-banner">
+          <span class="pill-tag gold">🏆 Quest Complete • 100% Forgiven &amp; Forever Loved!</span>
+          <h1 class="finale-title">Yay!! Thank You, My Queen! 💕</h1>
+          <p class="finale-sub">
+            You just made me the happiest guy alive. Here is our unlocked Pink Memory Scrapbook &amp; your official Apology Vouchers!
+          </p>
+
+          <div class="finale-actions">
+            <button class="btn-primary btn-glow" id="kissBurstBtn">
+              <span>Send Infinite Kisses &amp; Sparkles 💋✨</span>
+            </button>
+            <span class="kiss-counter">Kisses sent: <strong id="kissCount">0</strong></span>
+          </div>
+        </div>
+
+        <!-- Redeemable Love Coupons -->
+        <div class="section-block">
+          <h3 class="block-title">🎟️ Tap to Claim Your Apology Vouchers</h3>
+          <div class="coupons-grid">
+            <button class="coupon-card" data-coupon="0">
+              <div class="coupon-left">🍦</div>
+              <div class="coupon-body">
+                <h4>Guilt-Free Treat Date</h4>
+                <p>Ice cream, boba, momos, or whatever you crave — my treat, zero complaints.</p>
+              </div>
+              <div class="coupon-stamp">CLAIM</div>
+            </button>
+
+            <button class="coupon-card" data-coupon="1">
+              <div class="coupon-left">🫂</div>
+              <div class="coupon-body">
+                <h4>10-Minute Bear Hug</h4>
+                <p>Redeemable anytime you feel low or tired. Includes forehead kisses.</p>
+              </div>
+              <div class="coupon-stamp">CLAIM</div>
+            </button>
+
+            <button class="coupon-card" data-coupon="2">
+              <div class="coupon-left">🚗</div>
+              <div class="coupon-body">
+                <h4>Long Drive + Your Playlist</h4>
+                <p>Full DJ control, scenic route, and me admiring you the whole time.</p>
+              </div>
+              <div class="coupon-stamp">CLAIM</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Full Unlocked Scrapbook of all 5 photos -->
+        <div class="section-block">
+          <h3 class="block-title">📸 Our Pink Memory Scrapbook (Tap any photo to zoom)</h3>
+          <div class="scrapbook-grid" id="scrapbookGrid">
+            <!-- Populated cleanly via JS -->
+          </div>
+        </div>
+
+        <div class="replay-row">
+          <button class="btn-secondary" id="replayBtn">↺ Replay Apology Quest</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Lightbox / Album Modal -->
+  <div class="modal-backdrop hidden" id="photoModal" role="dialog" aria-modal="true" aria-label="Memory Lightbox">
+    <div class="modal-box">
+      <button class="modal-close" id="modalCloseBtn" aria-label="Close">✕</button>
+      <div class="modal-image-wrap">
+        <img id="modalImg" src="" alt="Memory" />
+      </div>
+      <div class="modal-meta">
+        <span class="modal-badge" id="modalBadge">Memory #1</span>
+        <p class="modal-caption" id="modalCaption"></p>
+        <p class="modal-love-note" id="modalNote"></p>
+      </div>
+      <div class="modal-nav">
+        <button class="btn-secondary" id="modalPrevBtn">← Prev</button>
+        <button class="btn-primary" id="modalHeartBtn">Send ♥</button>
+        <button class="btn-secondary" id="modalNextBtn">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
+
